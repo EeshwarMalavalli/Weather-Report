@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Weather Report UI</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+        .container{
+            display: flex;
+            gap: 25px;
+        }
+    </style>
+  </head>
+  <body class="bg-light py-5" style="align-items: center;">
+    <form class="form-layout" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="container">
+        <div class="card mx-auto shadow col-4" style="max-width: 500px">
+          <div class="card-body">
+            <h2 class="card-title text-center mb-4">Weather Report</h2>
+
+            <div class="mb-3">
+              <label for="latitude" class="form-label">Latitude</label>
+              <input
+                type="number"
+                class="form-control mb-2"
+                id="latitude"
+                min="-90"
+                max="90"
+                name="latitude"
+                placeholder="Enter latitude"
+              />
+              <input
+                type="range"
+                class="form-range"
+                id="latitudeRange"
+                min="-90"
+                max="90"
+                value="0"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="longitude" class="form-label">Longitude</label>
+              <input
+                type="number"
+                class="form-control mb-2"
+                id="longitude"
+                min="-180"
+                max="180"
+                name="longitude"
+                placeholder="Enter longitude"
+              />
+              <input
+                type="range"
+                class="form-range"
+                id="longitudeRange"
+                min="-180"
+                max="180"
+                value="0"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="date" class="form-label">Date</label>
+              <input type="date" class="form-control" id="date" name="date" />
+            </div>
+
+            <button class="btn btn-primary w-100" type="submit">
+              Get Weather Report
+            </button>
+
+          </div>
+        </div>
+
+
+        <div class="card mx-auto shadow col-8" >
+          <div class="card-body">
+            <!-- <h5 class="card-title text-center mb-4">Weather Report</h5> -->
+
+            <div class="alert alert-secondary text-center d-flex justify-content-center align-items-center" id="weatherReport" style="height: 100%;"
+            >
+              <h2>Weather Report</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </form>
+
+    <script>
+      const latitudeInput = document.getElementById("latitude");
+      const latitudeRange = document.getElementById("latitudeRange");
+      const longitudeInput = document.getElementById("longitude");
+      const longitudeRange = document.getElementById("longitudeRange");
+
+      latitudeInput.addEventListener(
+        "input",
+        () => (latitudeRange.value = latitudeInput.value)
+      );
+      latitudeRange.addEventListener(
+        "input",
+        () => (latitudeInput.value = latitudeRange.value)
+      );
+
+      longitudeInput.addEventListener(
+        "input",
+        () => (longitudeRange.value = longitudeInput.value)
+      );
+      longitudeRange.addEventListener(
+        "input",
+        () => (longitudeInput.value = longitudeRange.value)
+      );
+
+      function getWeatherReport() {
+        const lat = latitudeInput.value;
+        const lon = longitudeInput.value;
+        const date = document.getElementById("date").value;
+
+        if (!lat || !lon || !date) {
+          alert("Please fill in all fields.");
+          return;
+        }
+
+        document.getElementById(
+          "weatherReport"
+        ).textContent = `Weather Report for (${lat}, ${lon}) on ${date}: Clear skies with a gentle breeze.`;
+      }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
