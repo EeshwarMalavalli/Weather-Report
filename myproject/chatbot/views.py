@@ -17,7 +17,7 @@ def chatbot_model(request):
             ''' if the data produced by gemini is of json type
             For example -
             output_data.text = 
-            `   ``json
+            ```json
             {output_data from gemini}
             ```
             '''
@@ -28,7 +28,18 @@ def chatbot_model(request):
             print(json_output)
 
             # Convert json string (output_data_str) to Python dictonary
-            output_data_dict = json.loads(json_output.strip())
+            try:
+                output_data_dict = json.loads(json_output.strip())
+            except Exception:
+                ''' if gemini has added an extra text along with json dict
+                For example -
+                output_data.text = 
+                this is the ......
+                {output_data from gemini}
+                '''
+                start_index = json_output.find('{')
+                output_data_dict = json.loads(json_output[start_index:])
+
             
             return render(request, "chatbot_1.html", {"json_output": output_data_dict})
         
@@ -98,9 +109,13 @@ def gemini_output(input):
     """)
   
     if city_name.text!= 'NA\n':
+        ''' If there is a city name in the user message (assuming that the user wants the weather report 
+        of that city) '''
         weather_data =  real_weather_API(city_name.text)
 
         if weather_data == None:
+            ''' If there is no weather data avalaible for the specified city '''
+
             output = model.generate_content(f"""                   
             
             "You are an intelligent and friendly weather assistant chatbot. Your goal is to help users get 
@@ -181,6 +196,7 @@ def real_weather_API(city):
 
     API_KEY =  os.getenv('WEATHER_API_KEY')        # OpenWeatherMap
     CITY = city
+    
     URL_current_weather = f"http://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={API_KEY}&units=metric"
     response_1 = requests.get(URL_current_weather)
     
@@ -190,8 +206,8 @@ def real_weather_API(city):
     if response_1.status_code == 200 and response_2.status_code == 200:
         data = response_1.json()
         forecast_data = response_2.json()
-        forecast_list = forecast_data["list"]
-        forecast_list_output = []
+        forecast_list = forecast_data["list"] 
+        forecast_list_at_12_pm = []
         '''forecast_list = data["list"]
     
         # Show forecast for the next 5 days at 12:00 PM
@@ -202,11 +218,12 @@ def real_weather_API(city):
                 desc = item["weather"][0]["description"]
         '''
 
+        # Show forecast for the next 5 days at 12:00 PM
         for item in forecast_list:
             if "12:00:00" in item["dt_txt"]:
-                forecast_list_output.append(item)
+                forecast_list_at_12_pm.append(item)
 
-        return f"{data} + {forecast_list_output}"
+        return f"{data} + {forecast_list_at_12_pm}"
                 
 
     else:
